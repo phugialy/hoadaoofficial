@@ -33,10 +33,6 @@ google-credentials.json
 google-service-account.json
 *credentials*.json
 hoadaoposts-*.json
-*.json
-!package*.json
-!tsconfig.json
-!next.config.js
 
 # vercel
 .vercel
