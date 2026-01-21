@@ -5,9 +5,9 @@ import HomeGallerySection from '@/components/home/HomeGallerySection'
 import ActivitiesProgramsSection from '@/components/home/ActivitiesProgramsSection'
 import ContactSection from '@/components/home/ContactSection'
 import Link from 'next/link'
+import { createServerClient } from '@/lib/supabase'
 
-// Example carousel images - Replace with actual images from your Supabase storage
-// You can also fetch these dynamically from Supabase (see commented code below)
+// Example carousel images - fallback when DB is empty or fetch fails
 const defaultCarouselImages: CarouselImage[] = [
   {
     id: '1',
@@ -33,21 +33,48 @@ const defaultCarouselImages: CarouselImage[] = [
 ]
 
 export default async function Home() {
-  // Fetch carousel images from Supabase
+  // Fetch carousel images directly from Supabase (avoids fetch-to-self / localhost at build time on Vercel)
   let carouselImages = defaultCarouselImages
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/carousel`, {
-      cache: 'no-store',
-    })
-    if (response.ok) {
-      const data = await response.json()
-      if (data.images && data.images.length > 0) {
-        carouselImages = data.images
-      }
+    const supabase = createServerClient()
+    const { data, error } = await supabase
+      .from('carousel_images')
+      .select(`
+        *,
+        gallery_item:media_items!carousel_images_gallery_item_id_fkey (
+          url,
+          title,
+          description,
+          updated_at
+        )
+      `)
+      .eq('active', true)
+      .order('display_order', { ascending: true })
+      .order('created_at', { ascending: false })
+
+    if (!error && data && data.length > 0) {
+      carouselImages = data.map((item: { id: string; url: string; alt?: string; title?: string; description?: string; gallery_item_id?: string; gallery_item?: { url?: string; title?: string; description?: string } | null }) => {
+        const g = item.gallery_item
+        if (g && item.gallery_item_id) {
+          return {
+            id: item.id,
+            url: g.url || item.url,
+            alt: item.alt || g.title || item.title || undefined,
+            title: g.title || item.title || undefined,
+            description: g.description || item.description || undefined,
+          }
+        }
+        return {
+          id: item.id,
+          url: item.url,
+          alt: item.alt || item.title || undefined,
+          title: item.title || undefined,
+          description: item.description || undefined,
+        }
+      })
     }
   } catch (error) {
     console.error('Error fetching carousel images:', error)
-    // Fallback to default images
   }
 
   return (
