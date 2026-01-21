@@ -16,20 +16,21 @@ export const Navigation: React.FC = () => {
   ]
 
   return (
-    <nav className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-100 sticky top-0 z-50 transition-editorial">
+    <nav className="bg-white/95 backdrop-blur-sm sticky top-0 z-50 transition-editorial">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20 md:h-24">
-          {/* Logo: use public/logo.png; fallback to text if missing */}
-          <Link href="/" className="flex items-center group">
+          {/* Logo: public/logo-header.png (200×60); fallback to text if missing */}
+          <Link href="/" className="flex items-center shrink-0 group">
             {!logoError ? (
               <Image
-                src="/logo.png"
+                src="/logo-header.png"
                 alt="Hoa Dao Lion Dance Association"
                 width={200}
                 height={60}
-                className="h-10 md:h-12 w-auto object-contain"
+                className="h-20 md:h-24 w-auto max-w-[280px] object-contain object-left"
                 onError={() => setLogoError(true)}
                 priority
+                sizes="280px"
               />
             ) : (
               <span className="text-xl md:text-2xl font-display font-bold text-red-600 tracking-tight group-hover:text-red-700 transition-editorial">

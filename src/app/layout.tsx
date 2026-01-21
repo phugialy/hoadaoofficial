@@ -18,8 +18,11 @@ export const metadata: Metadata = {
   title: 'Hoa Dao Lion Dance Association - Vietnamese Lion Dance Cultural Organization',
   description: 'Showcasing Chinese New Year Lion Dance performances, team profiles, and cultural events',
   icons: {
-    icon: '/logo.png',
-    apple: '/logo.png',
+    icon: [
+      { url: '/favicon.png', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon.png', type: 'image/png', sizes: '192x192' },
+    ],
+    apple: '/favicon.png',
   },
 }
 
