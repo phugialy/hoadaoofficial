@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export const Navigation: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [logoError, setLogoError] = useState(false)
 
   const navItems = [
     { href: '/', label: 'Home' },
@@ -17,11 +19,23 @@ export const Navigation: React.FC = () => {
     <nav className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-100 sticky top-0 z-50 transition-editorial">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20 md:h-24">
-          {/* Logo */}
+          {/* Logo: use public/logo.png; fallback to text if missing */}
           <Link href="/" className="flex items-center group">
-            <span className="text-xl md:text-2xl font-display font-bold text-red-600 tracking-tight group-hover:text-red-700 transition-editorial">
-              🦁 Hoa Dao Lion Dance Association
-            </span>
+            {!logoError ? (
+              <Image
+                src="/logo.png"
+                alt="Hoa Dao Lion Dance Association"
+                width={200}
+                height={60}
+                className="h-10 md:h-12 w-auto object-contain"
+                onError={() => setLogoError(true)}
+                priority
+              />
+            ) : (
+              <span className="text-xl md:text-2xl font-display font-bold text-red-600 tracking-tight group-hover:text-red-700 transition-editorial">
+                🦁 Hoa Dao Lion Dance Association
+              </span>
+            )}
           </Link>
 
           {/* Desktop Navigation */}
