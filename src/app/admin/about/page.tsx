@@ -77,7 +77,7 @@ export default function AdminAboutPage() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold text-red-600 mb-2">About Content</h1>
-            <p className="text-gray-600">Manage your organization's mission and vision statements</p>
+            <p className="text-gray-600">Manage your organization&apos;s mission and vision statements</p>
           </div>
           <Link
             href="/admin"

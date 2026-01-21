@@ -84,7 +84,7 @@ export default function AboutContentManager() {
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">About Content</h2>
         <p className="text-gray-600">
-          Manage your organization's mission and vision statements displayed on the homepage.
+          Manage your organization&apos;s mission and vision statements displayed on the homepage.
         </p>
       </div>
 
@@ -113,10 +113,10 @@ export default function AboutContentManager() {
               rows={4}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"
-              placeholder="Enter your organization's mission statement..."
+              placeholder="Enter your organization&apos;s mission statement..."
             />
             <p className="mt-1 text-xs text-gray-500">
-              Describe your organization's purpose and goals
+              Describe your organization&apos;s purpose and goals
             </p>
           </div>
 
@@ -131,10 +131,10 @@ export default function AboutContentManager() {
               rows={4}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"
-              placeholder="Enter your organization's vision statement..."
+              placeholder="Enter your organization&apos;s vision statement..."
             />
             <p className="mt-1 text-xs text-gray-500">
-              Describe your organization's long-term aspirations
+              Describe your organization&apos;s long-term aspirations
             </p>
           </div>
 

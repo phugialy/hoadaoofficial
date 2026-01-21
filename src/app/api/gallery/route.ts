@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * Get public gallery images with pagination
  * GET /api/gallery?page=1&limit=20

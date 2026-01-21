@@ -81,10 +81,10 @@ export async function POST(request: NextRequest) {
         errorMessage = 'Post not found. The post may be private, deleted, or the URL is incorrect.'
       } else if (response.status === 403) {
         errorMessage = 'Access denied. The post may be private or restricted.'
-      } else if (errorData.error) {
-        errorMessage = errorData.error
-      } else if (errorData.error_message) {
-        errorMessage = errorData.error_message
+      } else if (errorData && typeof errorData === 'object' && 'error' in errorData) {
+        errorMessage = String(errorData.error)
+      } else if (errorData && typeof errorData === 'object' && 'error_message' in errorData) {
+        errorMessage = String(errorData.error_message)
       }
       
       console.error('Instagram oEmbed API error:', {

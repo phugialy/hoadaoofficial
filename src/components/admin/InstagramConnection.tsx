@@ -223,7 +223,7 @@ export default function InstagramConnection() {
             <p className="text-sm text-blue-800 font-semibold mb-2">How to get your credentials:</p>
             <ol className="text-sm text-blue-700 list-decimal list-inside space-y-1">
               <li>Go to <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener noreferrer" className="underline font-semibold">Facebook Developers</a> and create an app (or use existing)</li>
-              <li><strong>Add "Instagram" product:</strong> In your app dashboard, find "Instagram" in the products list and click "Set Up"</li>
+              <li><strong>Add &quot;Instagram&quot; product:</strong> In your app dashboard, find &quot;Instagram&quot; in the products list and click &quot;Set Up&quot;</li>
               <li>Connect your Instagram Business/Creator account to a Facebook Page</li>
               <li>Use <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener noreferrer" className="underline">Graph API Explorer</a> to get Access Token</li>
               <li>Get Instagram Business Account ID from Facebook Page → Settings → Instagram</li>
@@ -236,7 +236,7 @@ export default function InstagramConnection() {
               </p>
             </div>
             <p className="text-xs text-blue-600 mt-2">
-              💡 <strong>Tip:</strong> Adding the "Instagram" product is just clicking "Set Up" next to it in your app dashboard. No complex setup needed!
+              💡 <strong>Tip:</strong> Adding the &quot;Instagram&quot; product is just clicking &quot;Set Up&quot; next to it in your app dashboard. No complex setup needed!
             </p>
           </div>
 

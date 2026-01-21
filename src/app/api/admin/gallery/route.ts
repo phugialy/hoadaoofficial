@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import { checkAuth } from '@/lib/auth/serverAuth'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * Get all gallery images (admin only, includes inactive)
  * GET /api/admin/gallery?page=1&limit=20

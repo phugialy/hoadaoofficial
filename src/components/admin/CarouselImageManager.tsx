@@ -13,6 +13,7 @@ interface CarouselImage {
   description?: string
   display_order: number
   active: boolean
+  gallery_item_id?: string | null
   created_at: string
   updated_at: string
 }
@@ -81,20 +82,21 @@ export default function CarouselImageManager() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
-    // Validate gallery selection if in gallery mode
-    if (!editing && mode === 'gallery' && !selectedGalleryImage) {
-      setError('Please select an image from the gallery')
-      return
-    }
-
     const formData = new FormData(e.currentTarget)
     
     let url: string
     let title: string = ''
     let description: string = ''
+    let galleryItemId: string | null = null
 
-    if (!editing && mode === 'gallery' && selectedGalleryImage) {
-      // Use selected gallery image
+    if (editing) {
+      // Editing existing image
+      url = formData.get('url') as string || editing.url
+      title = formData.get('title') as string || editing.title || ''
+      description = formData.get('description') as string || editing.description || ''
+      galleryItemId = editing.gallery_item_id ?? null
+    } else if (mode === 'gallery' && selectedGalleryImage) {
+      // Creating new from gallery
       const galleryImage = galleryImages.find(img => img.id === selectedGalleryImage)
       if (!galleryImage) {
         setError('Selected gallery image not found')
@@ -103,9 +105,9 @@ export default function CarouselImageManager() {
       url = galleryImage.url
       title = galleryImage.title || ''
       description = galleryImage.description || ''
+      galleryItemId = selectedGalleryImage
     } else {
-      // This shouldn't happen - upload mode is handled separately
-      setError('Invalid mode')
+      setError('Please select an image from the gallery')
       return
     }
 
@@ -116,7 +118,7 @@ export default function CarouselImageManager() {
       description: description || formData.get('description') as string,
       display_order: parseInt(formData.get('display_order') as string) || 0,
       active: formData.get('active') === 'on',
-      gallery_item_id: mode === 'gallery' && selectedGalleryImage ? selectedGalleryImage : null, // Store reference to gallery item for sync
+      gallery_item_id: galleryItemId,
     }
 
     try {
@@ -133,7 +135,7 @@ export default function CarouselImageManager() {
       
       setShowForm(false)
       setEditing(null)
-      setMode('url')
+      setMode('gallery')
       setSelectedGalleryImage(null)
       fetchImages()
       // Refresh gallery list to show sync status
@@ -224,6 +226,112 @@ export default function CarouselImageManager() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update order')
     }
+  }
+
+  // Drag and drop handlers for upload mode
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+    const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith('image/'))
+    if (files.length > 0) uploadFiles(files)
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+    const fileArray = Array.from(files).filter((f) => f.type.startsWith('image/'))
+    if (fileArray.length > 0) uploadFiles(fileArray)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const uploadFiles = async (files: File[]) => {
+    if (files.length === 0) return
+    const queue = files.map((file) => ({
+      file,
+      progress: 0,
+      status: 'pending' as const,
+    }))
+    setUploadQueue(queue)
+    setUploading(true)
+    setError(null)
+    const maxOrder = images.length > 0 ? Math.max(...images.map((img) => img.display_order), 0) : -1
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      setUploadQueue((prev) =>
+        prev.map((item, idx) => (idx === i ? { ...item, status: 'uploading' as const } : item))
+      )
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('title', file.name.replace(/\.[^/.]+$/, ''))
+        formData.append('display_order', '0')
+        formData.append('active', 'true')
+
+        const upRes = await authenticatedFetch('/api/admin/gallery/upload', { method: 'POST', body: formData })
+        if (!upRes.ok) {
+          const d = await upRes.json()
+          throw new Error(d.error || 'Upload failed')
+        }
+        const { mediaItem } = await upRes.json()
+        if (!mediaItem?.id) throw new Error('No media item returned')
+
+        setUploadQueue((prev) =>
+          prev.map((item, idx) => (idx === i ? { ...item, progress: 50, status: 'uploading' as const } : item))
+        )
+
+        const carouselRes = await authenticatedFetch('/api/admin/carousel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: mediaItem.url,
+            alt: mediaItem.title,
+            title: mediaItem.title,
+            description: mediaItem.description || '',
+            display_order: maxOrder + 1 + i,
+            active: true,
+            gallery_item_id: mediaItem.id,
+          }),
+        })
+        if (!carouselRes.ok) throw new Error('Failed to add to carousel')
+
+        setUploadQueue((prev) =>
+          prev.map((item, idx) =>
+            idx === i ? { ...item, status: 'success' as const, progress: 100 } : item
+          )
+        )
+      } catch (err) {
+        setUploadQueue((prev) =>
+          prev.map((item, idx) =>
+            idx === i
+              ? { ...item, status: 'error' as const, error: err instanceof Error ? err.message : 'Failed' }
+              : item
+          )
+        )
+        setError(err instanceof Error ? err.message : 'Upload failed')
+      }
+    }
+    setUploading(false)
+    fetchImages()
+    fetchGalleryImages()
   }
 
   if (loading) {
@@ -651,7 +759,7 @@ export default function CarouselImageManager() {
                       {image.title || 'Untitled'}
                     </h3>
                     {/* Show sync status */}
-                    {(image as any).gallery_item_id ? (
+                    {image.gallery_item_id ? (
                       <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded flex items-center gap-1" title="Synced with gallery - updates automatically">
                         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -723,8 +831,8 @@ export default function CarouselImageManager() {
                       onClick={() => {
                         setEditing(image)
                         setShowForm(true)
-                        setMode((image as any).gallery_item_id ? 'gallery' : 'upload')
-                        setSelectedGalleryImage((image as any).gallery_item_id)
+                        setMode(image.gallery_item_id ? 'gallery' : 'upload')
+                        setSelectedGalleryImage(image.gallery_item_id ?? null)
                       }}
                       className="flex-1 px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
                     >

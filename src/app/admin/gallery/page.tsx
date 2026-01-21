@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import GalleryManager from '@/components/admin/GalleryManager'
 import { createBrowserClient } from '@/lib/supabase'
 import { isAuthenticated, isAdmin } from '@/lib/auth/adminAuth'
 
-export default function AdminGalleryPage() {
+function AdminGalleryContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
@@ -98,5 +98,19 @@ export default function AdminGalleryPage() {
         <GalleryManager />
       </div>
     </div>
+  )
+}
+
+export default function AdminGalleryPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-gray-600">Loading...</div>
+        </div>
+      }
+    >
+      <AdminGalleryContent />
+    </Suspense>
   )
 }

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import { checkAuth } from '@/lib/auth/serverAuth'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * Get about content (admin only)
  * GET /api/admin/about

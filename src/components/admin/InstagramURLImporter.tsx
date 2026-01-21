@@ -73,7 +73,7 @@ export default function InstagramURLImporter() {
       
       <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm text-blue-800 mb-2">
-          <strong>✨ Easy Import:</strong> Just paste an Instagram post URL and we'll import it automatically!
+          <strong>✨ Easy Import:</strong> Just paste an Instagram post URL and we&apos;ll import it automatically!
         </p>
         <p className="text-xs text-blue-700">
           Works with public Instagram posts. No API connection needed.
@@ -91,7 +91,7 @@ export default function InstagramURLImporter() {
             <br />• Instagram may be blocking the request
             <br />• Post may have been deleted
             <br />
-            <br /><strong>💡 Solution:</strong> If automatic import doesn't work, use the <strong>"+ Add Post"</strong> button below to manually add posts with all details.
+            <br /><strong>💡 Solution:</strong> If automatic import doesn&apos;t work, use the <strong>&quot;+ Add Post&quot;</strong> button below to manually add posts with all details.
           </p>
         </div>
       )}

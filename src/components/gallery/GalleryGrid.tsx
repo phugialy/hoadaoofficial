@@ -37,6 +37,7 @@ export default function GalleryGrid() {
 
   useEffect(() => {
     fetchImages()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page, pagination.limit])
 
   const fetchImages = async () => {

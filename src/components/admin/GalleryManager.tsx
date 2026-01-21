@@ -50,6 +50,7 @@ export default function GalleryManager() {
 
   useEffect(() => {
     fetchImages()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page])
 
   // Drag and drop handlers
@@ -470,9 +471,7 @@ export default function GalleryManager() {
                     {(item.status === 'uploading' || item.status === 'pending') && (
                       <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                         <div
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            item.status === 'error' ? 'bg-red-600' : 'bg-blue-600'
-                          }`}
+                          className="h-2 rounded-full transition-all duration-300 bg-blue-600"
                           style={{ width: `${item.progress}%` }}
                         />
                       </div>

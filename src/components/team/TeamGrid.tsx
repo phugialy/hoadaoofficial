@@ -12,6 +12,7 @@ export default function TeamGrid() {
 
   useEffect(() => {
     fetchTeamMembers()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchTeamMembers = async () => {
