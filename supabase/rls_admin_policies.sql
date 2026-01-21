@@ -42,3 +42,31 @@ CREATE POLICY "Admin delete access for events"
     (auth.jwt() ->> 'user_metadata')::jsonb ->> 'is_admin' = 'true'
   );
 
+-- Admin RLS Policies for Carousel Images Table
+DROP POLICY IF EXISTS "Admin full access to carousel_images" ON carousel_images;
+
+CREATE POLICY "Admin full access to carousel_images"
+  ON carousel_images
+  FOR ALL
+  TO authenticated
+  USING (
+    (auth.jwt() ->> 'user_metadata')::jsonb ->> 'is_admin' = 'true'
+  )
+  WITH CHECK (
+    (auth.jwt() ->> 'user_metadata')::jsonb ->> 'is_admin' = 'true'
+  );
+
+-- Admin RLS Policies for Instagram Posts Table
+DROP POLICY IF EXISTS "Admin full access to instagram_posts" ON instagram_posts;
+
+CREATE POLICY "Admin full access to instagram_posts"
+  ON instagram_posts
+  FOR ALL
+  TO authenticated
+  USING (
+    (auth.jwt() ->> 'user_metadata')::jsonb ->> 'is_admin' = 'true'
+  )
+  WITH CHECK (
+    (auth.jwt() ->> 'user_metadata')::jsonb ->> 'is_admin' = 'true'
+  );
+

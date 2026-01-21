@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn, signOut, isAuthenticated, isAdmin } from '@/lib/auth/adminAuth'
 
 export default function AdminLoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -17,12 +18,17 @@ export default function AdminLoginPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const getRedirectUrl = () => {
+    const returnUrl = searchParams.get('returnUrl')
+    return returnUrl || '/admin' // Default to dashboard instead of calendar
+  }
+
   const checkAuth = async () => {
     const authenticated = await isAuthenticated()
     if (authenticated) {
       const admin = await isAdmin()
       if (admin) {
-        router.push('/admin/calendar')
+        router.push(getRedirectUrl())
       }
     }
   }
@@ -62,8 +68,9 @@ export default function AdminLoginPage() {
 
       // Success - redirect using router.push for client-side navigation
       // This preserves the Supabase client instance and session
-      console.log('✅ Login successful, redirecting to /admin/calendar')
-      router.push('/admin/calendar')
+      const redirectUrl = getRedirectUrl()
+      console.log('✅ Login successful, redirecting to', redirectUrl)
+      router.push(redirectUrl)
     } catch (err) {
       console.error('Login error:', err)
       setError(err instanceof Error ? err.message : 'Failed to sign in')

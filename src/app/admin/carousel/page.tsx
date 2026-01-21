@@ -5,47 +5,35 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createBrowserClient } from '@/lib/supabase'
 import { isAuthenticated, isAdmin } from '@/lib/auth/adminAuth'
-import AdminCalendar from '@/components/admin/AdminCalendar'
-import SyncSheetButton from '@/components/admin/SyncSheetButton'
+import CarouselImageManager from '@/components/admin/CarouselImageManager'
 
-export default function AdminCalendarPage() {
+export default function AdminCarouselPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [authorized, setAuthorized] = useState(false)
 
   const checkAuth = async () => {
     try {
-      console.log('[Calendar] Starting auth check...')
-      
-      // Wait a bit for Supabase to initialize from localStorage
       await new Promise((resolve) => setTimeout(resolve, 100))
 
-      // Check authentication
       const authenticated = await isAuthenticated()
-
       if (!authenticated) {
-        console.log('[Calendar] Not authenticated, redirecting to login')
         router.push('/admin/login')
         setLoading(false)
         return
       }
 
-      // Check admin status
       const admin = await isAdmin()
-      console.log('[Calendar] Admin check result:', admin)
-
       if (!admin) {
-        console.log('[Calendar] Not admin, redirecting to login')
         router.push('/admin/login')
         setLoading(false)
         return
       }
 
-      console.log('[Calendar] ✅ Auth check passed, showing calendar')
       setAuthorized(true)
       setLoading(false)
     } catch (error) {
-      console.error('[Calendar] ❌ Auth check error:', error)
+      console.error('Auth check error:', error)
       router.push('/admin/login')
       setLoading(false)
     }
@@ -53,15 +41,12 @@ export default function AdminCalendarPage() {
 
   useEffect(() => {
     checkAuth()
-    
-    // Listen to auth state changes
+
     const supabase = createBrowserClient()
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('[Calendar] Auth state changed:', event, session ? 'has session' : 'no session')
+    } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        // Re-check auth when signed in
         checkAuth()
       } else if (event === 'SIGNED_OUT') {
         router.push('/admin/login')
@@ -71,7 +56,6 @@ export default function AdminCalendarPage() {
     return () => {
       subscription.unsubscribe()
     }
-    // Note: checkAuth and router are intentionally omitted from deps to avoid infinite loops
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -92,8 +76,8 @@ export default function AdminCalendarPage() {
       <div className="container mx-auto px-4">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-red-600 mb-2">Admin Calendar</h1>
-            <p className="text-gray-600">Manage events and calendar entries</p>
+            <h1 className="text-4xl font-bold text-red-600 mb-2">Carousel Images</h1>
+            <p className="text-gray-600">Manage featured images displayed on the homepage carousel</p>
           </div>
           <Link
             href="/admin"
@@ -102,12 +86,8 @@ export default function AdminCalendarPage() {
             ← Back to Dashboard
           </Link>
         </div>
-        <div className="mb-4">
-          <SyncSheetButton />
-        </div>
-        <AdminCalendar />
+        <CarouselImageManager />
       </div>
     </div>
   )
 }
-
