@@ -26,26 +26,26 @@ export const Footer: React.FC = () => {
   }, [])
 
   return (
-    <footer className="bg-red-500 text-white mt-auto">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+    <footer className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white mt-auto">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
           {/* Copyright */}
           <div className="text-center md:text-left">
-            <p className="text-body text-gold-200 mb-2">
-              HoadaoOfficial - Vietnamese Lion Dance Cultural Organization
+            <p className="text-body-lg text-gray-300 mb-3 font-light">
+              Hoa Dao Lion Dance Association
             </p>
-            <p className="text-body-sm text-gold-100">
+            <p className="text-body-sm text-gray-400">
               © {new Date().getFullYear()} All rights reserved
             </p>
           </div>
 
           {/* Social Media Links */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
             <a
               href={instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full transition-all duration-300 transform hover:scale-110"
+              className="flex items-center justify-center w-12 h-12 bg-white/10 hover:bg-white/20 rounded-2xl transition-editorial hover-lift backdrop-blur-sm"
               aria-label="Follow us on Instagram"
             >
               <svg
@@ -60,7 +60,7 @@ export const Footer: React.FC = () => {
               href={facebookUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full transition-all duration-300 transform hover:scale-110"
+              className="flex items-center justify-center w-12 h-12 bg-white/10 hover:bg-white/20 rounded-2xl transition-editorial hover-lift backdrop-blur-sm"
               aria-label="Follow us on Facebook"
             >
               <svg

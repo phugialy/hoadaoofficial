@@ -9,31 +9,31 @@ export const Navigation: React.FC = () => {
   const navItems = [
     { href: '/', label: 'Home' },
     { href: '/events', label: 'Events' },
-    { href: '/calendar', label: 'Calendar' },
     { href: '/team', label: 'Team' },
     { href: '/gallery', label: 'Gallery' },
   ]
 
   return (
-    <nav className="bg-white shadow-md border-b-2 border-red-200 sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 md:h-20">
+    <nav className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-100 sticky top-0 z-50 transition-editorial">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20 md:h-24">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <span className="text-2xl font-bold text-red-500">
-              🦁 HoadaoOfficial
+          <Link href="/" className="flex items-center group">
+            <span className="text-xl md:text-2xl font-display font-bold text-red-600 tracking-tight group-hover:text-red-700 transition-editorial">
+              🦁 Hoa Dao Lion Dance Association
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex gap-8">
+          <div className="hidden md:flex gap-10 lg:gap-12">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-gray-700 hover:text-red-500 transition-colors font-semibold"
+                className="text-body-sm text-gray-700 hover:text-red-600 transition-editorial font-medium tracking-wide relative group"
               >
                 {item.label}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-red-600 transition-all duration-300 group-hover:w-full"></span>
               </Link>
             ))}
           </div>
@@ -71,12 +71,12 @@ export const Navigation: React.FC = () => {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-red-200">
+          <div className="md:hidden py-6 border-t border-gray-100 space-y-2">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="block py-2 text-gray-700 hover:text-red-500 transition-colors"
+                className="block py-3 px-2 text-body-sm text-gray-700 hover:text-red-600 hover:bg-red-50/50 rounded-lg transition-editorial font-medium"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {item.label}

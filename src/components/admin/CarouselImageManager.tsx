@@ -173,6 +173,59 @@ export default function CarouselImageManager() {
     }
   }
 
+  const handleReorder = async (id: string, direction: 'up' | 'down') => {
+    const image = images.find(img => img.id === id)
+    if (!image) return
+
+    const sortedImages = [...images].sort((a, b) => a.display_order - b.display_order)
+    const currentIndex = sortedImages.findIndex(img => img.id === id)
+    
+    if (direction === 'up' && currentIndex === 0) return
+    if (direction === 'down' && currentIndex === sortedImages.length - 1) return
+
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+    const targetImage = sortedImages[targetIndex]
+
+    // Swap display orders
+    const newOrder = targetImage.display_order
+    const oldOrder = image.display_order
+
+    try {
+      // Update both images using the individual image route
+      await Promise.all([
+        authenticatedFetch(`/api/admin/carousel/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ display_order: newOrder }),
+        }),
+        authenticatedFetch(`/api/admin/carousel/${targetImage.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ display_order: oldOrder }),
+        }),
+      ])
+
+      fetchImages()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to reorder images')
+    }
+  }
+
+  const handleQuickOrderChange = async (id: string, newOrder: number) => {
+    try {
+      const response = await authenticatedFetch(`/api/admin/carousel/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ display_order: newOrder }),
+      })
+
+      if (!response.ok) throw new Error('Failed to update order')
+      fetchImages()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update order')
+    }
+  }
+
   if (loading) {
     return <div className="text-center py-12">Loading...</div>
   }
@@ -573,89 +626,127 @@ export default function CarouselImageManager() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {images
           .sort((a, b) => a.display_order - b.display_order)
-          .map((image) => (
-            <div
-              key={image.id}
-              className={`bg-white rounded-lg shadow-md overflow-hidden ${
-                !image.active ? 'opacity-50' : ''
-              }`}
-            >
-              <div className="relative h-48">
-                <Image
-                  src={image.url}
-                  alt={image.alt || image.title || 'Carousel image'}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-              </div>
-              <div className="p-4">
-                <div className="flex items-start justify-between mb-1">
-                  <h3 className="font-bold text-gray-800 flex-1">
-                    {image.title || 'Untitled'}
-                  </h3>
-                  {/* Show sync status */}
-                  {(image as any).gallery_item_id ? (
-                    <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded flex items-center gap-1" title="Synced with gallery - updates automatically">
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Synced
+          .map((image, index) => {
+            const sortedImages = [...images].sort((a, b) => a.display_order - b.display_order)
+            const currentIndex = sortedImages.findIndex(img => img.id === image.id)
+            return (
+              <div
+                key={image.id}
+                className={`bg-white rounded-lg shadow-md overflow-hidden ${
+                  !image.active ? 'opacity-50' : ''
+                }`}
+              >
+                <div className="relative h-48">
+                  <Image
+                    src={image.url}
+                    alt={image.alt || image.title || 'Carousel image'}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-1">
+                    <h3 className="font-bold text-gray-800 flex-1">
+                      {image.title || 'Untitled'}
+                    </h3>
+                    {/* Show sync status */}
+                    {(image as any).gallery_item_id ? (
+                      <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded flex items-center gap-1" title="Synced with gallery - updates automatically">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        Synced
+                      </span>
+                    ) : galleryImages.some(gImg => gImg.url === image.url) ? (
+                      <span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded flex items-center gap-1" title="This image exists in gallery but is not synced">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                        </svg>
+                        In Gallery
+                      </span>
+                    ) : null}
+                  </div>
+                  {image.description && (
+                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                      {image.description}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-2 mt-3 flex-wrap">
+                    <span
+                      className={`px-2 py-1 text-xs rounded ${
+                        image.active
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {image.active ? 'Active' : 'Inactive'}
                     </span>
-                  ) : galleryImages.some(gImg => gImg.url === image.url) ? (
-                    <span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded flex items-center gap-1" title="This image exists in gallery but is not synced">
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                      </svg>
-                      In Gallery
+                    <span className="text-xs text-gray-500">
+                      Order: {image.display_order}
                     </span>
-                  ) : null}
-                </div>
-                {image.description && (
-                  <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                    {image.description}
-                  </p>
-                )}
-                <div className="flex items-center gap-2 mt-3 flex-wrap">
-                  <span
-                    className={`px-2 py-1 text-xs rounded ${
-                      image.active
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {image.active ? 'Active' : 'Inactive'}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    Order: {image.display_order}
-                  </span>
-                </div>
-                <div className="mt-3 flex gap-2">
-                  <button
-                    onClick={() => {
-                      setEditing(image)
-                      setShowForm(true)
-                    }}
-                    className="flex-1 px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleToggleActive(image.id, image.active)}
-                    className="flex-1 px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600"
-                  >
-                    {image.active ? 'Deactivate' : 'Activate'}
-                  </button>
-                  <button
-                    onClick={() => handleDelete(image.id)}
-                    className="flex-1 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
+                  </div>
+
+                  {/* Order Controls */}
+                  <div className="mt-2 flex items-center gap-2 bg-gray-50 p-2 rounded">
+                    <span className="text-xs text-gray-600 flex-1">Quick Order:</span>
+                    <button
+                      onClick={() => handleReorder(image.id, 'up')}
+                      disabled={currentIndex === 0}
+                      className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      title="Move up"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      onClick={() => handleReorder(image.id, 'down')}
+                      disabled={currentIndex === sortedImages.length - 1}
+                      className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      title="Move down"
+                    >
+                      ↓
+                    </button>
+                    <input
+                      type="number"
+                      value={image.display_order}
+                      onChange={(e) => {
+                        const newOrder = parseInt(e.target.value) || 0
+                        handleQuickOrderChange(image.id, newOrder)
+                      }}
+                      className="w-16 px-2 py-1 text-xs border border-gray-300 rounded text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      title="Change display order"
+                    />
+                  </div>
+
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      onClick={() => {
+                        setEditing(image)
+                        setShowForm(true)
+                        setMode((image as any).gallery_item_id ? 'gallery' : 'upload')
+                        setSelectedGalleryImage((image as any).gallery_item_id)
+                      }}
+                      className="flex-1 px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleToggleActive(image.id, image.active)}
+                      className="flex-1 px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600 transition-colors"
+                    >
+                      {image.active ? 'Deactivate' : 'Activate'}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(image.id)}
+                      className="flex-1 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
       </div>
 
       {images.length === 0 && (

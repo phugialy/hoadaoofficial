@@ -488,178 +488,208 @@ export default function GalleryManager() {
         </div>
       )}
 
-      {/* Edit Form (only shown when editing) */}
-      {editing && (
-        <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-bold mb-4">Edit Image</h3>
-          <form onSubmit={handleUpdate}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  defaultValue={editing.title || ''}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  placeholder="Image title"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Display Order
-                </label>
-                <input
-                  type="number"
-                  name="display_order"
-                  defaultValue={editing.display_order || 0}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea
-                  name="description"
-                  defaultValue={editing.description || ''}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  placeholder="Image description"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="active"
-                    defaultChecked={editing.active !== false}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-sm font-medium text-gray-700">Active (visible in public gallery)</span>
-                </label>
-              </div>
-            </div>
-            <div className="mt-4 flex gap-2">
-              <button
-                type="submit"
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-              >
-                Update
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setEditing(null)
-                }}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
       {/* Images Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {sortedImages.map((image, index) => (
-            <div
-              key={image.id}
-              className={`bg-white rounded-lg shadow-md overflow-hidden ${
-                !image.active ? 'opacity-50' : ''
-              }`}
-            >
-              <div className="relative h-48">
-                <Image
-                  src={image.url}
-                  alt={image.title || 'Gallery image'}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                />
-              </div>
-              <div className="p-4">
-                <h3 className="font-bold text-gray-800 mb-1 truncate">
-                  {image.title || 'Untitled'}
-                </h3>
-                {image.description && (
-                  <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                    {image.description}
-                  </p>
-                )}
-                <div className="flex items-center gap-2 mt-3 flex-wrap">
-                  <span
-                    className={`px-2 py-1 text-xs rounded ${
-                      image.active
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {image.active ? 'Active' : 'Inactive'}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    Order: {image.display_order}
-                  </span>
-                </div>
-
-                {/* Order Controls */}
-                <div className="mt-2 flex items-center gap-2 bg-gray-50 p-2 rounded">
-                  <span className="text-xs text-gray-600 flex-1">Quick Order:</span>
-                  <button
-                    onClick={() => handleReorder(image.id, 'up')}
-                    disabled={sortBy !== 'display_order' || index === 0}
-                    className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Move up"
-                  >
-                    ↑
-                  </button>
-                  <button
-                    onClick={() => handleReorder(image.id, 'down')}
-                    disabled={sortBy !== 'display_order' || index === sortedImages.length - 1}
-                    className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Move down"
-                  >
-                    ↓
-                  </button>
-                  <input
-                    type="number"
-                    value={image.display_order}
-                    onChange={(e) => {
-                      const newOrder = parseInt(e.target.value) || 0
-                      handleQuickOrderChange(image.id, newOrder)
-                    }}
-                    className="w-16 px-2 py-1 text-xs border border-gray-300 rounded text-center"
-                    title="Change display order"
+        {sortedImages.map((image, index) => {
+          const isEditing = editing?.id === image.id
+          return (
+            <div key={image.id} className="col-span-full md:col-span-1">
+              <div
+                className={`bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ${
+                  !image.active ? 'opacity-50' : ''
+                } ${isEditing ? 'shadow-xl ring-2 ring-blue-500' : ''}`}
+              >
+                <div className="relative h-48">
+                  <Image
+                    src={image.url}
+                    alt={image.title || 'Gallery image'}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   />
                 </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-gray-800 mb-1 truncate">
+                    {image.title || 'Untitled'}
+                  </h3>
+                  {image.description && (
+                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                      {image.description}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-2 mt-3 flex-wrap">
+                    <span
+                      className={`px-2 py-1 text-xs rounded ${
+                        image.active
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {image.active ? 'Active' : 'Inactive'}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      Order: {image.display_order}
+                    </span>
+                  </div>
 
-                <div className="mt-3 flex gap-2">
-                  <button
-                    onClick={() => {
-                      setEditing(image)
-                    }}
-                    className="flex-1 px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleToggleActive(image.id, image.active)}
-                    className="flex-1 px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600"
-                  >
-                    {image.active ? 'Hide' : 'Show'}
-                  </button>
-                  <button
-                    onClick={() => handleDelete(image.id)}
-                    className="flex-1 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
+                  {/* Order Controls */}
+                  {!isEditing && (
+                    <div className="mt-2 flex items-center gap-2 bg-gray-50 p-2 rounded">
+                      <span className="text-xs text-gray-600 flex-1">Quick Order:</span>
+                      <button
+                        onClick={() => handleReorder(image.id, 'up')}
+                        disabled={sortBy !== 'display_order' || index === 0}
+                        className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Move up"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        onClick={() => handleReorder(image.id, 'down')}
+                        disabled={sortBy !== 'display_order' || index === sortedImages.length - 1}
+                        className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Move down"
+                      >
+                        ↓
+                      </button>
+                      <input
+                        type="number"
+                        value={image.display_order}
+                        onChange={(e) => {
+                          const newOrder = parseInt(e.target.value) || 0
+                          handleQuickOrderChange(image.id, newOrder)
+                        }}
+                        className="w-16 px-2 py-1 text-xs border border-gray-300 rounded text-center"
+                        title="Change display order"
+                      />
+                    </div>
+                  )}
+
+                  {!isEditing && (
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        onClick={() => {
+                          setEditing(image)
+                          // Scroll to the image card smoothly
+                          setTimeout(() => {
+                            const element = document.getElementById(`image-card-${image.id}`)
+                            element?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                          }, 100)
+                        }}
+                        className="flex-1 px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleToggleActive(image.id, image.active)}
+                        className="flex-1 px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600 transition-colors"
+                      >
+                        {image.active ? 'Hide' : 'Show'}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(image.id)}
+                        className="flex-1 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
                 </div>
+
+                {/* Animated Edit Form Dropdown */}
+                {isEditing && (
+                  <div
+                    id={`image-card-${image.id}`}
+                    className="border-t border-gray-200 bg-gray-50 animate-slide-down"
+                    style={{
+                      animation: 'slideDown 0.3s ease-out',
+                    }}
+                  >
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-bold text-gray-800">Edit Image</h3>
+                        <button
+                          onClick={() => setEditing(null)}
+                          className="text-gray-500 hover:text-gray-700 transition-colors"
+                          aria-label="Close edit form"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                      <form onSubmit={handleUpdate}>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Title
+                            </label>
+                            <input
+                              type="text"
+                              name="title"
+                              defaultValue={editing.title || ''}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Image title"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Display Order
+                            </label>
+                            <input
+                              type="number"
+                              name="display_order"
+                              defaultValue={editing.display_order || 0}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Description
+                            </label>
+                            <textarea
+                              name="description"
+                              defaultValue={editing.description || ''}
+                              rows={3}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Image description"
+                            />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                name="active"
+                                defaultChecked={editing.active !== false}
+                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                              />
+                              <span className="text-sm font-medium text-gray-700">Active (visible in public gallery)</span>
+                            </label>
+                          </div>
+                        </div>
+                        <div className="mt-6 flex gap-3">
+                          <button
+                            type="submit"
+                            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                          >
+                            Update
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditing(null)}
+                            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          ))}
+          )
+        })}
       </div>
 
       {/* Pagination */}

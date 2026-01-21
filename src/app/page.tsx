@@ -1,6 +1,9 @@
 import { MainLayout } from '@/components/layout/MainLayout'
 import ImageCarousel, { CarouselImage } from '@/components/social/ImageCarousel'
-import SocialMediaSection from '@/components/home/SocialMediaSection'
+import AboutSection from '@/components/home/AboutSection'
+import HomeGallerySection from '@/components/home/HomeGallerySection'
+import ActivitiesProgramsSection from '@/components/home/ActivitiesProgramsSection'
+import ContactSection from '@/components/home/ContactSection'
 import Link from 'next/link'
 
 // Example carousel images - Replace with actual images from your Supabase storage
@@ -49,106 +52,63 @@ export default async function Home() {
 
   return (
     <MainLayout>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-red-50 via-white to-gold-50 py-12 md:py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-hero md:text-6xl text-red-500 mb-6 font-bold">
-              Welcome to HoadaoOfficial
-            </h1>
-            <p className="text-body-lg md:text-xl text-text-secondary mb-8">
-              Vietnamese Lion Dance Cultural Organization
-            </p>
-            <p className="text-body text-text-primary mb-8 max-w-2xl mx-auto">
-              Experience the vibrant tradition of Chinese New Year Lion Dance performances. 
-              Join us in celebrating cultural heritage through dynamic performances, 
-              community events, and cultural education.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/events"
-                className="px-8 py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
-              >
-                View Events
-              </Link>
-              <Link
-                href="/team"
-                className="px-8 py-3 bg-gold-500 text-white rounded-lg font-semibold hover:bg-gold-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
-              >
-                Meet the Team
-              </Link>
+      {/* Hero Section - Stunning Carousel */}
+      <section className="relative bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+        <div className="relative z-20">
+          <ImageCarousel
+            images={carouselImages}
+            autoPlay={true}
+            autoPlayInterval={6000}
+            showIndicators={true}
+            showControls={true}
+            className="h-[70vh] md:h-[85vh]"
+          />
+          {/* Hero Overlay Content - Positioned at bottom to not block image */}
+          <div className="absolute inset-0 z-30 flex items-end justify-center pointer-events-none">
+            <div className="w-full">
+              {/* Subtle gradient overlay only at bottom */}
+              <div className="bg-gradient-to-t from-black/80 via-black/40 to-transparent pt-20 pb-8 md:pb-12">
+                <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+                  <div className="text-center animate-fade-in-up">
+                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-3 md:mb-4 drop-shadow-2xl tracking-tight leading-tight">
+                      Welcome to Hoa Dao Lion Dance Association
+                    </h1>
+                    <p className="text-lg md:text-xl lg:text-2xl text-white/90 mb-6 md:mb-8 drop-shadow-lg font-light leading-relaxed max-w-3xl mx-auto">
+                      Preserving Vietnamese Lion Dance Culture
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-4 md:gap-5 pointer-events-auto animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                      <Link
+                        href="/events"
+                        className="px-8 py-3 md:px-10 md:py-4 bg-red-600/95 backdrop-blur-md text-white rounded-xl font-medium hover:bg-red-700 transition-editorial hover-lift shadow-xl text-base md:text-body-lg border border-white/20"
+                      >
+                        View Events
+                      </Link>
+                      <Link
+                        href="/team"
+                        className="px-8 py-3 md:px-10 md:py-4 bg-gold-500/95 backdrop-blur-md text-white rounded-xl font-medium hover:bg-gold-600 transition-editorial hover-lift shadow-xl text-base md:text-body-lg border border-white/20"
+                      >
+                        Meet the Team
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Carousel Section */}
-      <section className="py-12 md:py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-h2 md:text-4xl text-gray-800 mb-4 font-bold">
-              Featured Highlights
-            </h2>
-            <p className="text-body-lg text-text-secondary max-w-2xl mx-auto">
-              Discover our latest performances and cultural celebrations
-            </p>
-          </div>
-          <ImageCarousel
-            images={carouselImages}
-            autoPlay={true}
-            autoPlayInterval={5000}
-            showIndicators={true}
-            showControls={true}
-          />
-        </div>
-      </section>
+      {/* About Section */}
+      <AboutSection />
 
+      {/* Gallery Section */}
+      <HomeGallerySection />
 
-      {/* Social Media Section */}
-      <SocialMediaSection />
+      {/* Activities & Programs Section */}
+      <ActivitiesProgramsSection />
 
-      {/* Quick Links Section */}
-      <section className="py-12 md:py-16 bg-gradient-to-r from-red-50 to-gold-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-h2 md:text-4xl text-gray-800 mb-4 font-bold">
-              Explore More
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <Link
-              href="/events"
-              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-center"
-            >
-              <div className="text-4xl mb-4">📅</div>
-              <h3 className="text-h3 text-gray-800 mb-2 font-semibold">Events</h3>
-              <p className="text-body-sm text-text-secondary">
-                View our upcoming performances and cultural events
-              </p>
-            </Link>
-            <Link
-              href="/team"
-              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-center"
-            >
-              <div className="text-4xl mb-4">👥</div>
-              <h3 className="text-h3 text-gray-800 mb-2 font-semibold">Team</h3>
-              <p className="text-body-sm text-text-secondary">
-                Meet our talented performers and team members
-              </p>
-            </Link>
-            <Link
-              href="/gallery"
-              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-center"
-            >
-              <div className="text-4xl mb-4">🖼️</div>
-              <h3 className="text-h3 text-gray-800 mb-2 font-semibold">Gallery</h3>
-              <p className="text-body-sm text-text-secondary">
-                Browse our photo and video collection
-              </p>
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Contact Section */}
+      <ContactSection />
     </MainLayout>
   )
 }

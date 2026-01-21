@@ -93,6 +93,13 @@ export default function AdminDashboardPage() {
       color: 'bg-green-500',
     },
     {
+      title: 'About Content',
+      description: 'Edit organization mission and vision statements',
+      href: '/admin/about',
+      icon: '📝',
+      color: 'bg-indigo-500',
+    },
+    {
       title: 'Instagram Posts',
       description: 'Manage Instagram feed posts',
       href: '/admin/instagram',

@@ -70,3 +70,17 @@ CREATE POLICY "Admin full access to instagram_posts"
     (auth.jwt() ->> 'user_metadata')::jsonb ->> 'is_admin' = 'true'
   );
 
+-- Admin RLS Policies for About Content Table
+DROP POLICY IF EXISTS "Admin full access to about_content" ON about_content;
+
+CREATE POLICY "Admin full access to about_content"
+  ON about_content
+  FOR ALL
+  TO authenticated
+  USING (
+    (auth.jwt() ->> 'user_metadata')::jsonb ->> 'is_admin' = 'true'
+  )
+  WITH CHECK (
+    (auth.jwt() ->> 'user_metadata')::jsonb ->> 'is_admin' = 'true'
+  );
+
